@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EP Videos</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --c1: #ff006e;
+      --c2: #fb5607;
+      --c3: #ffbe0b;
+      --c4: #8338ec;
+      --c5: #3a86ff;
+      --text: #ffffff;
+      --muted: rgba(255,255,255,0.55);
+      --radius: 16px;
+      --card-w: 300px;
+      --card-h: 200px;
+    }
+
+    /* ── Fondo animado ── */
+    body {
+      color: var(--text);
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+      background: #0a0015;
+    }
+
+    /* Capa de gradiente que rota */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: -50%;
+      width: 200%;
+      height: 200%;
+      background: conic-gradient(
+        from 0deg at 40% 50%,
+        #ff006e33 0deg,
+        #8338ec44 60deg,
+        #3a86ff33 120deg,
+        #06d6a044 180deg,
+        #ffbe0b33 240deg,
+        #fb560733 300deg,
+        #ff006e33 360deg
+      );
+      animation: spinBg 18s linear infinite;
+      z-index: 0;
+    }
+
+    /* Segunda capa blur para suavizar */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: rgba(10, 0, 21, 0.55);
+      backdrop-filter: blur(60px);
+      z-index: 1;
+    }
+
+    @keyframes spinBg {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Todo el contenido por encima del fondo */
+    header, .section-title, .grid, .modal-backdrop { position: relative; z-index: 2; }
+
+    /* ── Burbujas decorativas ── */
+    .bubble {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.35;
+      pointer-events: none;
+      z-index: 1;
+      animation: drift linear infinite;
+    }
+    .b1 { width: 400px; height: 400px; background: var(--c1); top: -100px; left: -100px; animation-duration: 20s; }
+    .b2 { width: 300px; height: 300px; background: var(--c4); top: 30%; right: -80px; animation-duration: 25s; animation-delay: -8s; }
+    .b3 { width: 350px; height: 350px; background: var(--c5); bottom: -80px; left: 30%; animation-duration: 22s; animation-delay: -4s; }
+    .b4 { width: 200px; height: 200px; background: var(--c3); bottom: 20%; right: 20%; animation-duration: 18s; animation-delay: -12s; }
+
+    @keyframes drift {
+      0%   { transform: translate(0, 0) scale(1); }
+      33%  { transform: translate(30px, -20px) scale(1.05); }
+      66%  { transform: translate(-20px, 30px) scale(0.95); }
+      100% { transform: translate(0, 0) scale(1); }
+    }
+
+    /* ── Header ── */
+    header {
+      padding: 32px 48px 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      backdrop-filter: blur(10px);
+      background: rgba(255,255,255,0.04);
+    }
+
+    .logo {
+      width: 44px; height: 44px;
+      background: linear-gradient(135deg, var(--c1), var(--c4));
+      border-radius: 12px;
+      display: grid; place-items: center;
+      box-shadow: 0 0 20px rgba(255,0,110,0.5);
+    }
+    .logo svg { width: 22px; height: 22px; fill: white; }
+
+    header h1 {
+      font-size: 1.6rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      background: linear-gradient(90deg, #fff, var(--c3), var(--c1));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .badge {
+      margin-left: auto;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: rgba(255,255,255,0.7);
+      font-size: 0.72rem;
+      padding: 5px 14px;
+      border-radius: 999px;
+      backdrop-filter: blur(6px);
+    }
+
+    /* ── Section title ── */
+    .section-title {
+      padding: 36px 48px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .section-title h2 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      background: linear-gradient(90deg, #fff 60%, rgba(255,255,255,0.4));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .pill {
+      background: linear-gradient(135deg, var(--c1), var(--c4));
+      color: white;
+      font-size: 0.62rem;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 999px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      box-shadow: 0 0 12px rgba(255,0,110,0.5);
+    }
+
+    /* ── Grid ── */
+    .grid {
+      padding: 0 48px 64px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(var(--card-w), 1fr));
+      gap: 24px;
+    }
+
+    /* ── Card ── */
+    .card {
+      position: relative;
+      border-radius: var(--radius);
+      background: rgba(255,255,255,0.07);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255,255,255,0.12);
+      cursor: pointer;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+      transition: transform 0.3s cubic-bezier(.25,.8,.25,1),
+                  box-shadow 0.3s ease,
+                  border-color 0.3s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-8px) scale(1.02);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.6), 0 0 40px rgba(255,0,110,0.25);
+      border-color: rgba(255,0,110,0.6);
+      z-index: 10;
+    }
+
+    /* Brillo de color en hover (esquina) */
+    .card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,0,110,0.15) 0%, transparent 60%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      z-index: 0;
+      pointer-events: none;
+    }
+    .card:hover::before { opacity: 1; }
+
+    /* ── Media ── */
+    .card-media {
+      position: relative;
+      width: 100%;
+      height: var(--card-h);
+      background: #110020;
+      overflow: hidden;
+    }
+
+    .card-media video,
+    .card-media img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: opacity 0.4s ease;
+    }
+
+    .card-media .thumb { position: absolute; inset: 0; z-index: 1; }
+    .card-media video  { position: absolute; inset: 0; z-index: 2; opacity: 0; }
+    .card:hover .card-media .thumb { opacity: 0; }
+    .card:hover .card-media video  { opacity: 1; }
+
+    /* ── Duration ── */
+    .duration {
+      position: absolute; bottom: 8px; right: 10px; z-index: 5;
+      background: rgba(0,0,0,0.65);
+      color: #fff; font-size: 0.68rem; font-weight: 600;
+      padding: 2px 7px; border-radius: 5px;
+      backdrop-filter: blur(4px);
+    }
+
+    /* ── Play overlay ── */
+    .play-overlay {
+      position: absolute; inset: 0; z-index: 4;
+      display: grid; place-items: center;
+      opacity: 0; transition: opacity 0.25s ease;
+      background: radial-gradient(ellipse at center, rgba(0,0,0,0.4) 0%, transparent 70%);
+    }
+    .card:hover .play-overlay { opacity: 1; }
+
+    .play-btn {
+      width: 56px; height: 56px;
+      background: rgba(255,255,255,0.12);
+      border: 2px solid rgba(255,255,255,0.7);
+      border-radius: 50%;
+      display: grid; place-items: center;
+      backdrop-filter: blur(8px);
+      transition: transform 0.2s, background 0.2s, box-shadow 0.2s;
+    }
+    .play-btn svg { width: 22px; height: 22px; fill: white; margin-left: 3px; }
+    .card:hover .play-btn {
+      transform: scale(1.12);
+      background: rgba(255,0,110,0.55);
+      box-shadow: 0 0 24px rgba(255,0,110,0.7);
+    }
+
+    /* ── Preview tag ── */
+    .preview-tag {
+      position: absolute; top: 10px; left: 10px; z-index: 5;
+      background: linear-gradient(135deg, var(--c1), var(--c4));
+      color: white; font-size: 0.58rem; font-weight: 700;
+      padding: 3px 8px; border-radius: 5px;
+      text-transform: uppercase; letter-spacing: 0.06em;
+      opacity: 0; transform: translateY(-5px);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      box-shadow: 0 0 10px rgba(255,0,110,0.5);
+    }
+    .card:hover .preview-tag { opacity: 1; transform: translateY(0); }
+
+    /* ── Card info ── */
+    .card-info { padding: 14px 16px 16px; position: relative; z-index: 1; }
+
+    .card-info h3 {
+      font-size: 0.95rem; font-weight: 700;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      color: #fff;
+    }
+
+    .card-meta {
+      margin-top: 7px; display: flex; align-items: center;
+      gap: 8px; flex-wrap: wrap;
+    }
+    .card-meta span { font-size: 0.72rem; color: var(--muted); }
+    .tag {
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.15);
+      color: var(--c3);
+      font-size: 0.65rem; padding: 2px 9px;
+      border-radius: 999px; font-weight: 700;
+    }
+
+    /* ── Progress bar ── */
+    .progress-bar {
+      position: absolute; bottom: 0; left: 0;
+      height: 3px; width: 0%;
+      background: linear-gradient(90deg, var(--c1), var(--c3), var(--c4));
+      z-index: 6; transition: none;
+      border-radius: 0 2px 2px 0;
+    }
+    .card:hover .progress-bar { width: 40%; transition: width 8s linear; }
+
+    /* ── Ver completo button (flotante sobre la card) ── */
+    .btn-full {
+      position: absolute;
+      bottom: 58px;        /* justo encima del card-info */
+      right: 12px;
+      z-index: 30;
+      background: linear-gradient(135deg, var(--c1), var(--c4));
+      color: #fff;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 7px 14px;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      box-shadow: 0 0 18px rgba(255,0,110,0.65);
+      opacity: 0;
+      transform: translateY(6px);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      pointer-events: none;
+      white-space: nowrap;
+      letter-spacing: 0.02em;
+    }
+    .btn-full svg { width: 12px; height: 12px; fill: white; flex-shrink: 0; }
+    .btn-full.visible {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+    .btn-full:hover {
+      box-shadow: 0 0 28px rgba(255,0,110,0.95);
+      transform: translateY(-2px) scale(1.05);
+    }
+
+    /* ── Add Card ── */
+    .card-add {
+      border: 2px dashed rgba(255,255,255,0.2);
+      background: rgba(255,255,255,0.03);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 10px;
+      height: calc(var(--card-h) + 80px);
+      color: rgba(255,255,255,0.35);
+      font-size: 0.82rem; cursor: pointer;
+      transition: border-color 0.2s, color 0.2s, background 0.2s;
+    }
+    .card-add:hover {
+      border-color: var(--c1);
+      color: var(--c1);
+      background: rgba(255,0,110,0.06);
+      transform: none; box-shadow: none;
+      border: 2px dashed var(--c1);
+      outline: none;
+    }
+    .card-add svg { width: 34px; height: 34px; stroke: currentColor; fill: none; stroke-width: 1.5; }
+
+    /* ── Modal ── */
+    .modal-backdrop {
+      display: none; position: fixed; inset: 0;
+      background: rgba(5,0,15,0.85);
+      z-index: 1000; backdrop-filter: blur(12px);
+      align-items: center; justify-content: center;
+    }
+    .modal-backdrop.open { display: flex; }
+
+    .modal {
+      background: rgba(20,5,40,0.95);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 20px;
+      width: min(92vw, 880px);
+      overflow: hidden;
+      box-shadow: 0 40px 100px rgba(0,0,0,0.8), 0 0 60px rgba(255,0,110,0.15);
+      animation: slideUp 0.3s cubic-bezier(.25,.8,.25,1);
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(30px) scale(0.97); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .modal-video-wrap {
+      position: relative; width: 100%; aspect-ratio: 16/9; background: #000;
+    }
+    .modal-video-wrap video { width: 100%; height: 100%; object-fit: contain; }
+
+    /* ── Botón "Ver video completo" dentro del modal ── */
+    .modal-btn-full {
+      position: absolute;
+      bottom: 60px;
+      right: 16px;
+      z-index: 20;
+      background: linear-gradient(135deg, var(--c1), var(--c4));
+      color: #fff;
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 5px 12px;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      box-shadow: 0 0 14px rgba(255,0,110,0.5);
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity 0.35s ease, transform 0.35s ease, box-shadow 0.2s ease;
+      pointer-events: none;
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+    }
+    .modal-btn-full svg { width: 14px; height: 14px; fill: white; flex-shrink: 0; }
+    .modal-btn-full.visible {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+    .modal-btn-full:hover {
+      box-shadow: 0 0 32px rgba(255,0,110,0.9);
+      transform: translateY(-2px) scale(1.04);
+    }
+
+    .modal-close {
+      position: absolute; top: 14px; right: 14px;
+      width: 36px; height: 36px;
+      background: rgba(0,0,0,0.6); border: none; border-radius: 50%;
+      color: white; font-size: 1.1rem; cursor: pointer;
+      display: grid; place-items: center;
+      backdrop-filter: blur(4px);
+      transition: background 0.2s, transform 0.2s;
+      z-index: 10;
+    }
+    .modal-close:hover { background: var(--c1); transform: scale(1.1); }
+
+    .modal-info { padding: 20px 26px 26px; }
+    .modal-info h2 {
+      font-size: 1.2rem; font-weight: 700; margin-bottom: 8px;
+      background: linear-gradient(90deg, #fff, var(--c3));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .modal-info p { font-size: 0.84rem; color: var(--muted); line-height: 1.65; }
+
+    /* ── Responsive ── */
+    @media (max-width: 600px) {
+      header, .section-title, .grid { padding-left: 20px; padding-right: 20px; }
+      :root { --card-w: 260px; --card-h: 170px; }
+    }
+
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 3px; }
+  </style>
+</head>
+<body>
+
+<!-- Burbujas de fondo -->
+<div class="bubble b1"></div>
+<div class="bubble b2"></div>
+<div class="bubble b3"></div>
+<div class="bubble b4"></div>
+
+<!-- ══════════════ HEADER ══════════════ -->
+<header>
+  <div class="logo">
+    <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+  </div>
+  <h1>EP Videos</h1>
+  <span class="badge">🎵 Preview on hover</span>
+</header>
+
+<!-- ══════════════ SECTION ══════════════ -->
+<div class="section-title">
+  <h2>Mis Videos</h2>
+  <span class="pill">▶ Preview</span>
+</div>
+
+<!-- ══════════════ GRID ══════════════ -->
+<div class="grid" id="videoGrid">
+
+  <!--
+    ═══════════════════════════════════════════════
+    CÓMO AGREGAR TUS VIDEOS:
+    1. Pon tus archivos en la carpeta videitos/
+    2. Duplica un bloque <div class="card">
+    3. Cambia data-src, data-title, data-desc y el src del <video>
+    ═══════════════════════════════════════════════
+  -->
+
+  <!-- ── Card 1 – Ruth Cecilia ── -->
+  <div class="card"
+       data-title="Ruth Cecilia"
+       data-desc="Pasa el mouse para ver la preview. Click para ver completo."
+       data-src="videitos/1-Ruth Cecilia-preview.mp4"
+       data-full="videitos/1-Ruth Cecilia.mp4"
+       onclick="openModal(this)">
+    <div class="card-media">
+      <img class="thumb" src="" alt="Ruth Cecilia"
+           onerror="this.style.background='linear-gradient(135deg,#1a0030,#3d0060)';this.src='';">
+      <!-- Preview corto: solo los primeros 2 minutos -->
+      <video src="videitos/1-Ruth Cecilia-preview.mp4"
+             muted playsinline preload="metadata"
+             onmouseenter="this.play()"
+             onmouseleave="this.pause()">
+      </video>
+      <div class="play-overlay">
+        <div class="play-btn">
+          <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        </div>
+      </div>
+      <span class="preview-tag">▶ Preview</span>
+      <span class="duration">— : —</span>
+      <div class="progress-bar"></div>
+    </div>
+    <button class="btn-full" onclick="openModalAt(event, this)">
+      <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+      Ver video completo
+    </button>
+    <div class="card-info">
+      <h3>Ruth Cecilia</h3>
+      <div class="card-meta">
+        <span>🎬 1-Ruth Cecilia.mp4</span>
+        <span class="tag">EP</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Add Card ── -->
+  <div class="card card-add" title="Agregar video">
+    <svg viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="10"/>
+      <line x1="12" y1="8" x2="12" y2="16"/>
+      <line x1="8" y1="12" x2="16" y2="12"/>
+    </svg>
+    <span>Agregar video</span>
+  </div>
+
+</div><!-- /grid -->
+
+
+<!-- ══════════════ MODAL ══════════════ -->
+<div class="modal-backdrop" id="modalBackdrop" onclick="closeModalOnBackdrop(event)">
+  <div class="modal">
+    <div class="modal-video-wrap">
+      <video id="modalVideo" controls preload="metadata">
+        Tu navegador no soporta video HTML5.
+      </video>
+      <button class="modal-btn-full" id="modalBtnFull">
+        <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        Ver video completo
+      </button>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-info">
+      <h2 id="modalTitle">—</h2>
+      <p id="modalDesc">—</p>
+    </div>
+  </div>
+</div>
+
+
+<script>
+  /* ══ PREVIEW EN CARD ══ */
+  document.querySelectorAll('.card:not(.card-add)').forEach(card => {
+    const vid = card.querySelector('video');
+    const dur = card.querySelector('.duration');
+    const btn = card.querySelector('.btn-full');
+    if (!vid) return;
+
+    // Mostrar duración del preview
+    if (dur) {
+      vid.addEventListener('loadedmetadata', () => {
+        const s = Math.floor(vid.duration);
+        dur.textContent = `${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;
+      });
+    }
+
+    // Mostrar/ocultar botón "Ver video completo"
+    if (btn) {
+      vid.addEventListener('play',  () => btn.classList.add('visible'));
+      vid.addEventListener('pause', () => btn.classList.remove('visible'));
+      vid.addEventListener('ended', () => btn.classList.remove('visible'));
+    }
+  });
+
+  /* ══ MODAL ══ */
+  const backdrop     = document.getElementById('modalBackdrop');
+  const modalVideo   = document.getElementById('modalVideo');
+  const modalTitle   = document.getElementById('modalTitle');
+  const modalDesc    = document.getElementById('modalDesc');
+  const modalBtnFull = document.getElementById('modalBtnFull');
+
+  let currentFullSrc = ''; // ruta del video original de la card activa
+
+  // Botón del modal: aparece mientras el video corre
+  modalVideo.addEventListener('play',  () => modalBtnFull.classList.add('visible'));
+  modalVideo.addEventListener('pause', () => modalBtnFull.classList.remove('visible'));
+  modalVideo.addEventListener('ended', () => modalBtnFull.classList.remove('visible'));
+
+  // Botón del modal → carga el video original completo desde el mismo segundo
+  modalBtnFull.addEventListener('click', () => {
+    if (!currentFullSrc) return;
+    const savedTime = modalVideo.currentTime; // segundo donde está el preview
+    modalBtnFull.classList.remove('visible');
+    modalVideo.src = currentFullSrc;
+    modalVideo.addEventListener('loadedmetadata', function onMeta() {
+      modalVideo.removeEventListener('loadedmetadata', onMeta);
+      modalVideo.currentTime = savedTime;
+      modalVideo.addEventListener('seeked', function onSeeked() {
+        modalVideo.removeEventListener('seeked', onSeeked);
+        modalVideo.play();
+      });
+    });
+  });
+
+  /* Click en la card → abre el PREVIEW (2 min) en el modal */
+  function openModal(card) {
+    const previewVid = card.querySelector('video');
+    if (previewVid) previewVid.pause();
+    currentFullSrc = card.dataset.full || '';
+    modalTitle.textContent = card.dataset.title || 'Sin título';
+    modalDesc.textContent  = card.dataset.desc  || '';
+    modalVideo.src = card.dataset.src || '';
+    backdrop.classList.add('open');
+    modalVideo.play();
+  }
+
+  /* Botón "Ver video completo" en la card → abre el ORIGINAL directamente */
+  function openModalAt(e, btn) {
+    e.stopPropagation();
+    const card = btn.closest('.card');
+    const previewVid = card.querySelector('video');
+    if (previewVid) previewVid.pause();
+    currentFullSrc = card.dataset.full || '';
+    modalTitle.textContent = card.dataset.title || 'Sin título';
+    modalDesc.textContent  = card.dataset.desc  || '';
+    modalVideo.src = currentFullSrc;
+    backdrop.classList.add('open');
+    modalVideo.play();
+  }
+
+  function closeModal() {
+    backdrop.classList.remove('open');
+    modalVideo.pause();
+    modalVideo.src = '';
+  }
+
+  function closeModalOnBackdrop(e) {
+    if (e.target === backdrop) closeModal();
+  }
+
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,8 @@
+# Archivos del sistema
+.DS_Store
+
+# Videos (demasiado pesados para GitHub)
+videitos/*.mp4
+videitos/*.mov
+videitos/*.avi
+videitos/*.mkv
